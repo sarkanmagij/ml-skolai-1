@@ -193,8 +193,7 @@ const html = `<!DOCTYPE html>
     ${cards}
   </main>
   <footer class="site-footer inner">
-    <p>Static site. <strong>Vercel:</strong> import this repo and deploy (root <code>vercel.json</code> builds <code>website/</code> automatically), or set the project root to <code>website</code> and run <code>npm run build</code> as the build command.</p>
-    <p><strong>Previews:</strong> PDFs are embedded from this site. <strong>View notebook online</strong> opens Jupyter nbviewer, which fetches the public <code>.ipynb</code> URL — it only works after the site is deployed over HTTPS, not from <code>file://</code> or private networks.</p>
+    <p>Made with ❤️, more or less automatically.</p>
   </footer>
 </body>
 </html>`;
