@@ -129,6 +129,23 @@ const cards = manifest
     const pdfBtn = row.pdf
       ? `<a class="btn btn-pdf" href="${row.pdf}" download>Download PDF</a>`
       : `<span class="btn btn-disabled">PDF missing — export locally</span>`;
+
+    const nbviewerBtn = row.ipynb
+      ? `<a class="btn btn-viewer" data-nb-path="${row.ipynb}" href="https://nbviewer.org/" target="_blank" rel="noopener noreferrer">View notebook online</a>`
+      : "";
+
+    const pdfPreview = row.pdf
+      ? `<details class="preview-details">
+      <summary class="preview-summary">Preview — PDF (exported with outputs). Click to expand.</summary>
+      <div class="preview-shell" role="region" aria-label="Embedded PDF preview">
+        <iframe class="preview-iframe" src="${row.pdf}#view=FitH" title="PDF preview for module ${row.id}" loading="lazy"></iframe>
+      </div>
+      <p class="preview-meta"><a href="${row.pdf}" target="_blank" rel="noopener">Open PDF in a new tab</a> if the embed does not load.</p>
+    </details>`
+      : `<div class="preview-fallback" role="note">
+      <p><strong>No PDF on disk.</strong> Use <em>View notebook online</em> after deploy, or download the <code>.ipynb</code> and open in Jupyter.</p>
+    </div>`;
+
     return `
     <article class="module" id="module-${row.id}">
       <header class="module-head">
@@ -138,9 +155,11 @@ const cards = manifest
           <p class="module-blurb">${escapeHtml(row.blurb)}</p>
         </div>
       </header>
+      ${pdfPreview}
       <div class="module-actions">
         ${ipynbBtn}
         ${pdfBtn}
+        ${nbviewerBtn}
       </div>
     </article>`;
   })
@@ -160,12 +179,13 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ML course — notebooks & PDFs</title>
   <link rel="stylesheet" href="/styles.css" />
+  <script src="/preview.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="inner">
       <h1>Machine learning — course materials</h1>
-      <p class="tagline">Ten modules with Jupyter notebooks and PDF exports. Use the links below to jump to each module.</p>
+      <p class="tagline">Ten modules with Jupyter notebooks and PDF exports. Each section includes an embedded PDF preview and an optional online notebook viewer. Jump to a module below.</p>
       <nav class="toc" aria-label="Modules">${nav}</nav>
     </div>
   </header>
@@ -174,6 +194,7 @@ const html = `<!DOCTYPE html>
   </main>
   <footer class="site-footer inner">
     <p>Static site. <strong>Vercel:</strong> import this repo and deploy (root <code>vercel.json</code> builds <code>website/</code> automatically), or set the project root to <code>website</code> and run <code>npm run build</code> as the build command.</p>
+    <p><strong>Previews:</strong> PDFs are embedded from this site. <strong>View notebook online</strong> opens Jupyter nbviewer, which fetches the public <code>.ipynb</code> URL — it only works after the site is deployed over HTTPS, not from <code>file://</code> or private networks.</p>
   </footer>
 </body>
 </html>`;

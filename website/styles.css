@@ -133,6 +133,85 @@ main {
   font-size: 0.95rem;
 }
 
+.preview-details {
+  margin: 0 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+  .preview-details {
+    background: rgba(0, 0, 0, 0.03);
+  }
+}
+
+.preview-summary {
+  cursor: pointer;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+  list-style: none;
+  user-select: none;
+}
+
+.preview-summary::-webkit-details-marker {
+  display: none;
+}
+
+.preview-summary::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+details[open] > .preview-summary::before {
+  transform: rotate(90deg);
+}
+
+.preview-shell {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  height: min(62vh, 640px);
+  border-top: 1px solid var(--border);
+}
+
+.preview-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: 0;
+  background: var(--bg);
+}
+
+.preview-meta {
+  margin: 0;
+  padding: 0.5rem 0.85rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.preview-meta a {
+  color: var(--accent);
+}
+
+.preview-fallback {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.preview-fallback code {
+  font-size: 0.85em;
+}
+
 .module-actions {
   display: flex;
   flex-wrap: wrap;
@@ -166,6 +245,16 @@ main {
 .btn-pdf {
   background: linear-gradient(135deg, var(--accent2), #5b4dc4);
   color: #fff;
+}
+
+.btn-viewer {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.btn-viewer:hover {
+  background: rgba(91, 159, 212, 0.12);
 }
 
 .btn-disabled {
