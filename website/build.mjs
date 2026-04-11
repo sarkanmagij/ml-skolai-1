@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -5,6 +6,54 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.join(__dirname, "..");
 const OUT = path.join(__dirname, "assignments");
+
+/**
+ * Link to the notebook on GitHub (blob URL). GitHub renders .ipynb in the browser.
+ * Nbviewer + deployment URL or raw.githubusercontent.com often 404 (private repo, or
+ * nbviewer fetch failures). The blob page works for public repos; private repos need login.
+ */
+function getGithubContext() {
+  const owner = process.env.VERCEL_GIT_REPO_OWNER;
+  const slug = process.env.VERCEL_GIT_REPO_SLUG;
+  const ref = process.env.VERCEL_GIT_COMMIT_REF || "main";
+  if (owner && slug) {
+    return { owner, slug, ref };
+  }
+  try {
+    const url = execSync("git config --get remote.origin.url", {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+    }).trim();
+    const m = url.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/i);
+    if (!m) return null;
+    let repoSlug = m[2].trim();
+    if (repoSlug.endsWith(".git")) repoSlug = repoSlug.slice(0, -4);
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+    }).trim();
+    return { owner: m[1].trim(), slug: repoSlug, ref: branch };
+  } catch {
+    return null;
+  }
+}
+
+/** @param {{ id: number; ipynb: string }} m @param {{ owner: string; slug: string; ref: string }} ctx */
+function githubBlobIpynbUrl(m, ctx) {
+  const fileEnc = encodeURIComponent(m.ipynb);
+  return `https://github.com/${ctx.owner}/${ctx.slug}/blob/${ctx.ref}/${m.id}/${fileEnc}`;
+}
+
+function escapeAttr(s) {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+const githubCtx = getGithubContext();
+if (!githubCtx) {
+  console.warn(
+    "No GitHub repo context (set VERCEL_GIT_* or run from a git clone with github.com remote). Omitting 'View on GitHub' links."
+  );
+}
 
 /** @type {{ id: number; title: string; blurb: string; ipynb: string; pdf: string }[]} */
 const MODULES = [
@@ -121,6 +170,8 @@ for (const m of MODULES) {
 
 fs.writeFileSync(path.join(__dirname, "manifest.json"), JSON.stringify(manifest, null, 2));
 
+const moduleById = new Map(MODULES.map((m) => [m.id, m]));
+
 const cards = manifest
   .map((row) => {
     const ipynbBtn = row.ipynb
@@ -130,9 +181,12 @@ const cards = manifest
       ? `<a class="btn btn-pdf" href="${row.pdf}" download>Download PDF</a>`
       : `<span class="btn btn-disabled">PDF missing — export locally</span>`;
 
-    const nbviewerBtn = row.ipynb
-      ? `<a class="btn btn-viewer" data-nb-path="${row.ipynb}" href="https://nbviewer.org/" target="_blank" rel="noopener noreferrer">View notebook online</a>`
-      : "";
+    const mod = moduleById.get(row.id);
+    let nbviewerBtn = "";
+    if (row.ipynb && githubCtx && mod) {
+      const viewUrl = githubBlobIpynbUrl(mod, githubCtx);
+      nbviewerBtn = `<a class="btn btn-viewer" href="${escapeAttr(viewUrl)}" target="_blank" rel="noopener noreferrer">View on GitHub</a>`;
+    }
 
     const pdfPreview = row.pdf
       ? `<details class="preview-details">
@@ -143,7 +197,7 @@ const cards = manifest
       <p class="preview-meta"><a href="${row.pdf}" target="_blank" rel="noopener">Open PDF in a new tab</a> if the embed does not load.</p>
     </details>`
       : `<div class="preview-fallback" role="note">
-      <p><strong>No PDF on disk.</strong> Use <em>View notebook online</em> after deploy, or download the <code>.ipynb</code> and open in Jupyter.</p>
+      <p><strong>No PDF on disk.</strong> Download the <code>.ipynb</code> or use the online viewer when available.</p>
     </div>`;
 
     return `
@@ -179,13 +233,12 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ML course — notebooks & PDFs</title>
   <link rel="stylesheet" href="/styles.css" />
-  <script src="/preview.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="inner">
       <h1>Machine learning — course materials</h1>
-      <p class="tagline">Ten modules with Jupyter notebooks and PDF exports. Each section includes an embedded PDF preview and an optional online notebook viewer. Jump to a module below.</p>
+      <p class="tagline">Ten modules with Jupyter notebooks and PDF exports. Each section includes a PDF preview and a link to open the notebook on GitHub (when repo metadata is available). Jump to a module below.</p>
       <nav class="toc" aria-label="Modules">${nav}</nav>
     </div>
   </header>
