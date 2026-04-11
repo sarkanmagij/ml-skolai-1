@@ -1,0 +1,16 @@
+# nbconvert LaTeX/PDF support directories
+*_files/
+
+.DS_Store
+**/__pycache__/
+*.pyc
+.python-version
+
+# Website build output (regenerated on Vercel / npm run build)
+website/node_modules/
+website/assignments/
+website/index.html
+website/manifest.json
+
+# CatBoost training logs
+**/catboost_info/

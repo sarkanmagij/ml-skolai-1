@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Export notebook to PDF (WebPDF, no LaTeX)",
+      "type": "shell",
+      "command": "python3 export_notebook_pdf.py 05_LinearRegression_AutoMPG_unsolved.ipynb",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Assignment runtime
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+jupyter
+nbformat
+xgboost
+lightgbm
+catboost
+prophet
+
+# PDF export without LaTeX (run: python3 -m playwright install chromium)
+nbconvert[webpdf]
+playwright
