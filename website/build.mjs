@@ -235,13 +235,6 @@ const cards = manifest
       ? `<a class="btn btn-pdf" href="${row.pdf}" download>Download PDF</a>`
       : `<span class="btn btn-disabled">PDF missing — export locally</span>`;
 
-    const mod = moduleById.get(row.id);
-    let nbviewerBtn = "";
-    if (row.ipynb && githubCtx && mod) {
-      const viewUrl = githubBlobIpynbUrl(mod, githubCtx);
-      nbviewerBtn = `<a class="btn btn-viewer" href="${escapeAttr(viewUrl)}" target="_blank" rel="noopener noreferrer">View on GitHub</a>`;
-    }
-
     const pdfPreview = row.pdf
       ? `<details class="preview-details">
       <summary class="preview-summary">Preview — PDF (exported with outputs). Click to expand.</summary>
@@ -267,7 +260,6 @@ const cards = manifest
       <div class="module-actions">
         ${ipynbBtn}
         ${pdfBtn}
-        ${nbviewerBtn}
       </div>
     </article>`;
   })
