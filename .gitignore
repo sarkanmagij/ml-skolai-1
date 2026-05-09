@@ -14,3 +14,6 @@ website/manifest.json
 
 # CatBoost training logs
 **/catboost_info/
+
+# Downloaded ML datasets (MNIST, CIFAR-10, etc. — auto-fetched at runtime)
+**/data/
