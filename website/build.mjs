@@ -38,7 +38,7 @@ function getGithubContext() {
   }
 }
 
-/** @param {{ id: number; ipynb: string }} m @param {{ owner: string; slug: string; ref: string }} ctx */
+/** @param {{ id: number|string; ipynb: string }} m @param {{ owner: string; slug: string; ref: string }} ctx */
 function githubBlobIpynbUrl(m, ctx) {
   const fileEnc = encodeURIComponent(m.ipynb);
   return `https://github.com/${ctx.owner}/${ctx.slug}/blob/${ctx.ref}/${m.id}/${fileEnc}`;
@@ -55,10 +55,12 @@ if (!githubCtx) {
   );
 }
 
-/** @type {{ id: number; title: string; blurb: string; ipynb: string; pdf: string }[]} */
+/** @type {{ id: number|string; level: string; title: string; blurb: string; ipynb: string; pdf: string }[]} */
 const MODULES = [
+  // ML1 — Classical Machine Learning
   {
     id: 1,
+    level: "ML1",
     title: "Exploratory data analysis",
     blurb: "Palmer Penguins — load, inspect, missing values, plots.",
     ipynb: "02_EDA_Penguins_assignment_unsolved.ipynb",
@@ -66,6 +68,7 @@ const MODULES = [
   },
   {
     id: 2,
+    level: "ML1",
     title: "Linear regression",
     blurb: "Auto MPG — train/test split, metrics, coefficients.",
     ipynb: "05_LinearRegression_AutoMPG_unsolved.ipynb",
@@ -73,6 +76,7 @@ const MODULES = [
   },
   {
     id: 3,
+    level: "ML1",
     title: "Logistic regression",
     blurb: "Iris — scaling, confusion matrix, decision boundary.",
     ipynb: "06_LogisticRegression_Iris_unsolved.ipynb",
@@ -80,6 +84,7 @@ const MODULES = [
   },
   {
     id: 4,
+    level: "ML1",
     title: "Decision trees",
     blurb: "Wine dataset — train a tree, plot, feature importance.",
     ipynb: "07_decision_trees_exercise.ipynb",
@@ -87,6 +92,7 @@ const MODULES = [
   },
   {
     id: 5,
+    level: "ML1",
     title: "Random Forest",
     blurb: "Sonar — rock vs mine classification.",
     ipynb: "08_Exercise_02_RandomForest_RockOrMine_UNSOLVED (1).ipynb",
@@ -94,6 +100,7 @@ const MODULES = [
   },
   {
     id: 6,
+    level: "ML1",
     title: "XGBoost",
     blurb: "Iris — DMatrix API and sklearn classifier.",
     ipynb: "11_XGBoost_unsolved.ipynb",
@@ -101,6 +108,7 @@ const MODULES = [
   },
   {
     id: 7,
+    level: "ML1",
     title: "Gradient boosting compared",
     blurb: "XGBoost, LightGBM, CatBoost on bank marketing data.",
     ipynb: "GBM_Comparison_UNSOLVED.ipynb",
@@ -108,6 +116,7 @@ const MODULES = [
   },
   {
     id: 8,
+    level: "ML1",
     title: "K-means clustering",
     blurb: "Mall customers — elbow method, segments, silhouette.",
     ipynb: "09_k-means_unsolved.ipynb",
@@ -115,6 +124,7 @@ const MODULES = [
   },
   {
     id: 9,
+    level: "ML1",
     title: "Principal component analysis",
     blurb: "Penguins & wine — variance, 2D projection, reconstruction.",
     ipynb: "Exercise_PCA_Basics_UNSOLVED (1).ipynb",
@@ -122,10 +132,53 @@ const MODULES = [
   },
   {
     id: 10,
+    level: "ML1",
     title: "Prophet forecasting",
     blurb: "Microsoft stock — seasonality, future horizon, MAE.",
     ipynb: "13_Prophet_unsolved (1).ipynb",
     pdf: "13_Prophet_unsolved (1).pdf",
+  },
+
+  // ML2 — Deep Learning
+  {
+    id: "2.1",
+    level: "ML2",
+    title: "Intro to PyTorch",
+    blurb: "Tensors, autograd, and training a model with PyTorch.",
+    ipynb: "igors_02_Intro_to_pytorch_UNSOLVED (1)_solved.ipynb",
+    pdf: "igors_02_Intro_to_pytorch_UNSOLVED (1)_solved.pdf",
+  },
+  {
+    id: "2.2",
+    level: "ML2",
+    title: "Simple neural network",
+    blurb: "Build and train a feedforward network in PyTorch.",
+    ipynb: "igors_03_Simple_Neural_Network_Exercise_UNSOLVED_solved.ipynb",
+    pdf: "igors_03_Simple_Neural_Network_Exercise_UNSOLVED_solved.pdf",
+  },
+  {
+    id: "2.3",
+    level: "ML2",
+    title: "Regularization & optimization",
+    blurb: "Dropout, batch norm, and learning rate schedulers.",
+    ipynb: "igors_04_Regularization_and_Optimization_Exercise_UNSOLVED_solved.ipynb",
+    pdf: "igors_04_Regularization_and_Optimization_Exercise_UNSOLVED_solved.pdf",
+  },
+  {
+    id: "2.4",
+    level: "ML2",
+    title: "CIFAR-10 CNN",
+    blurb: "Convolutional neural network for image classification.",
+    ipynb: "igors_05_cifar10_cnn_unsolved_solved.ipynb",
+    pdf: "igors_05_cifar10_cnn_unsolved_solved.pdf",
+  },
+  {
+    id: "2.5",
+    level: "ML2",
+    title: "Sales forecasting (LSTM)",
+    blurb: "LSTM for sequence-based time-series prediction.",
+    ipynb: "igors_07_Sales_Forecasting_with_LSTM_unsolved_solved.ipynb",
+    pdf: "igors_07_Sales_Forecasting_with_LSTM_unsolved_solved.pdf",
   },
 ];
 
@@ -161,6 +214,7 @@ for (const m of MODULES) {
 
   manifest.push({
     id: m.id,
+    level: m.level,
     title: m.title,
     blurb: m.blurb,
     ipynb: ipynbHref,
@@ -201,7 +255,7 @@ const cards = manifest
     </div>`;
 
     return `
-    <article class="module" id="module-${row.id}">
+    <article class="module" id="module-${row.id}" data-level="${row.level}">
       <header class="module-head">
         <span class="module-num">${String(row.id).padStart(2, "0")}</span>
         <div>
@@ -222,7 +276,7 @@ const cards = manifest
 const nav = manifest
   .map(
     (row) =>
-      `<a class="nav-link" href="#module-${row.id}">${String(row.id).padStart(2, "0")}</a>`
+      `<a class="nav-link" href="#module-${row.id}" data-level="${row.level}">${String(row.id).padStart(2, "0")}</a>`
   )
   .join("");
 
@@ -238,7 +292,12 @@ const html = `<!DOCTYPE html>
   <header class="site-header">
     <div class="inner">
       <h1>Machine learning — course materials</h1>
-      <p class="tagline">Ten modules with Jupyter notebooks and PDF exports. Each section includes a PDF preview and a link to open the notebook on GitHub (when repo metadata is available). Jump to a module below.</p>
+      <p class="tagline">Fifteen modules across two levels. ML1 covers classical machine learning; ML2 goes deeper into neural networks and PyTorch. Each section includes a PDF preview and a link to view the notebook on GitHub.</p>
+      <div class="filter-bar" role="group" aria-label="Filter by level">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="ML1">ML1</button>
+        <button class="filter-btn" data-filter="ML2">ML2</button>
+      </div>
       <nav class="toc" aria-label="Modules">${nav}</nav>
     </div>
   </header>
@@ -248,6 +307,21 @@ const html = `<!DOCTYPE html>
   <footer class="site-footer inner">
     <p>Made with ❤️, more or less automatically.</p>
   </footer>
+  <script>
+    (function () {
+      var btns = document.querySelectorAll('.filter-btn');
+      btns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          btns.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var filter = btn.dataset.filter;
+          document.querySelectorAll('[data-level]').forEach(function (el) {
+            el.style.display = (filter === 'all' || el.dataset.level === filter) ? '' : 'none';
+          });
+        });
+      });
+    })();
+  </script>
 </body>
 </html>`;
 
